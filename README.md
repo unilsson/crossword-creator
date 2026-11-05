@@ -3,13 +3,13 @@
 Prototyp för att konstruera svenska korsord av den klassiska typen, med numrerade
 rutor och ledtrådarna listade bredvid rutnätet (alltså inte bildkorsord).
 
-- **Rutnätseditor**: svarta rutor (med eller utan symmetri), automatisk numrering och tangentbordsnavigering.
+- **Rutnätseditor**: svarta rutor, automatisk numrering och tangentbordsnavigering.
 - **Ordförslag**: visar ord från ordlistan som passar mönstret i den markerade luckan.
 - **Automatisk fyllning**: fyller resten av rutnätet. Bokstäver du själv skrivit in räknas som låsta.
 - **Ordkontroll**: ifyllda ord som saknas i ordlistan markeras.
 - **Ledtrådar**: vågrätt och lodrätt, med AI-förslag på tre svårighetsnivåer (valfritt).
 - **Spara och öppna** som JSON-fil. Arbetet sparas också automatiskt i webbläsaren.
-- **Utskrift**: tomt rutnät med nummer och ledtrådar.
+- **Utskrift och PDF**: tomt rutnät med nummer och ledtrådar på ett A4.
 
 ## Kom igång
 
@@ -35,22 +35,83 @@ du starta hämtningen med knappen **Hämta SALDO** i gränssnittet, eller med:
 docker compose exec korsord python -m crossword.saldo fetch
 ```
 
-### Använda gränssnittet
+### Stoppa, starta och uppdatera
 
-| Gör så här | Resultat |
+```bash
+docker compose down              # stoppa (ordlistan finns kvar i volymen)
+docker compose up -d             # starta igen
+git pull && docker compose up -d --build   # hämta senaste versionen
+```
+
+Ladda om sidan med `Ctrl+Shift+R` (`Cmd+Shift+R` på Mac) efter en uppdatering,
+så att webbläsaren inte använder gamla filer.
+
+## Så gör du ett korsord
+
+**1. Vänta in ordlistan.** Uppe till höger står hur många ord som är inlästa.
+Med exempellistan (cirka 450 ord) går det bara att fylla mycket små rutnät.
+Vänta tills SALDO är klar, ungefär 100 000 ord.
+
+**2. Skapa rutnätet.** Ange rader och kolumner (till exempel 9 × 9) och klicka
+**Nytt rutnät**.
+
+**3. Placera svarta rutor.** Klicka på en ruta och tryck `.` (punkt). Tryck `.`
+igen för att ta bort en svart ruta du satt fel. Alternativt slår du på **Rita svarta**
+och klickar direkt i rutnätet. Ett klick gör rutan svart, nästa gör den vit igen.
+
+*Symmetri* (avstängt som standard) speglar varje svart ruta till motsatt
+hörn, som i engelska tidningskorsord. Låt den vara av om du vill placera rutorna fritt.
+
+**4. Lägg in egna ord (valfritt).** Klicka på startrutan och skriv. Klicka en gång
+till på samma ruta, eller tryck mellanslag, för att byta mellan vågrätt och lodrätt.
+Panelen till höger visar ord som passar i den markerade luckan. Klicka på ett
+ord för att sätta in det. Bokstäver du själv skrivit in visas i svart och är låsta.
+
+**5. Fyll resten automatiskt.** Klicka **Fyll automatiskt**. Ifyllda bokstäver
+visas i blått.
+- Gillar du inte resultatet: klicka **Töm autofyllt** och fyll igen. Varje gång blir det en ny variant.
+- Vill du behålla ett autofyllt ord: skriv över dess bokstäver med samma bokstäver,
+  så blir de låsta.
+- Om fyllningen misslyckas: lägg till svarta rutor eller ta bort ett låst ord som
+  är svårt att bygga runt. Stora öppna ytor är svåra, och motorn ger upp efter 15 sekunder.
+
+Ord som saknas i ordlistan markeras med rött i ledtrådslistan,
+till exempel egennamn. Det är bara en varning: ordet får stå kvar.
+
+**6. Skriv ledtrådar.** Varje ord har en textruta under *Vågrätt* och *Lodrätt*.
+Med AI påslaget (se nedan) ger **✨ Förslag** fyra förslag. Klicka på ett för att
+använda det. Svårighetsgraden väljer du med *AI-nivå*.
+
+**7. Spara.** Allt sparas automatiskt i webbläsaren. **Spara fil** laddar ner
+korsordet som JSON. Det är den riktiga säkerhetskopian och öppnas igen med
+**Öppna fil**.
+
+**8. Skriv ut eller gör PDF.** **Skriv ut** ger rutnätet utan facit, med nummer
+och ledtrådar i två kolumner på ett A4. Välj *Spara som PDF* i utskriftsdialogen
+för att få en PDF. Om sidhuvud eller sidfot med URL och datum ändå syns: stäng av
+*Skriv ut sidhuvud och sidfot* i dialogens fler inställningar.
+
+### Kortkommandon
+
+| Tangent | Gör |
 |---|---|
-| Klicka på en ruta | Markerar den; klicka igen för att byta riktning |
-| Skriv bokstäver | Fyller i och hoppar till nästa ruta |
-| `.` eller **Rita svarta** | Växlar svart ruta (speglas om *Symmetri* är på) |
+| Bokstäver | Skriver och går till nästa ruta |
+| `.` | Växlar svart ruta |
 | `Mellanslag` | Byter riktning vågrätt/lodrätt |
+| Piltangenter | Flyttar markören |
 | `Tab` / `Shift+Tab` | Nästa/föregående ord |
-| Klicka på ett ordförslag | Sätter in ordet i luckan |
-| **Fyll automatiskt** | Fyller tomma rutor; autofyllda bokstäver visas i blått |
-| **Töm autofyllt** | Tar bort bara det fyllmotorn satt in |
+| `Backsteg` | Raderar och går bakåt |
+| `Delete` | Raderar utan att flytta |
 
-Tips: ju fler svarta rutor och ju kortare ord, desto lättare är det att fylla.
-Stora öppna ytor utan svarta rutor är svåra, och fyllmotorn ger upp efter 15 sekunder.
-Prova då att lägga till fler svarta rutor eller att låsa några bra ord först.
+## Felsökning
+
+| Problem | Lösning |
+|---|---|
+| Porten är upptagen | Ändra `PORT` i `.env`, t.ex. `PORT=8090`, och kör `docker compose up -d` |
+| SALDO blir aldrig klar | Håll muspekaren över statusraden för att se felet. Kör `docker compose logs korsord`. Starta om hämtningen med knappen **Hämta SALDO** |
+| Gamla knappar eller utseende efter uppdatering | Ladda om med `Ctrl+Shift+R` |
+| Vill börja om med ordlistan | `docker compose down -v` tar bort volymen. Nästa start hämtar SALDO på nytt |
+| AI-knappen ger fel | Kontrollera `.env` och statusraden (*AI: …*). Felet från AI-tjänsten visas i en ruta längst ner |
 
 ## AI för ledtrådar
 
@@ -147,5 +208,5 @@ I rutnätet är `"#"` en svart ruta, `""` en tom ruta och annars en bokstav.
 - Egna svartlistor och favoritord.
 - Temaord via AI, filtrerade mot ordlistan.
 - AI-granskning av ledtrådar (entydighet, rätt böjning).
-- Export till PDF och ipuz, och en spelbar webbversion.
+- Facitutskrift, export till ipuz och en spelbar webbversion.
 - Bildkorsord (ledtrådar i rutorna med pilar).
