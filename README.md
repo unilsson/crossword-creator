@@ -14,7 +14,8 @@ rutor och ledtrådarna listade bredvid rutnätet (alltså inte bildkorsord).
 ## Kom igång
 
 ```bash
-git clone https://github.com/unilsson/crossword-creator.git
+git clone git@github.com:unilsson/crossword-creator.git
+# eller via HTTPS: git clone https://github.com/unilsson/crossword-creator.git
 cd crossword-creator
 cp .env.example .env        # valfritt, för AI-inställningar
 docker compose up -d --build
