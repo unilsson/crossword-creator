@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Korsordsmakaren</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='1' width='6' height='6' fill='none' stroke='black'/%3E%3Crect x='9' y='1' width='6' height='6'/%3E%3Crect x='1' y='9' width='6' height='6' fill='none' stroke='black'/%3E%3Crect x='9' y='9' width='6' height='6' fill='none' stroke='black'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <i></i><i class="b"></i><i></i><i></i>
+      </span>
+      <input id="title" class="title-input" value="Mitt korsord" aria-label="Korsordets titel">
+    </div>
+    <div class="status" id="status">Laddar ordlista …</div>
+  </header>
+
+  <nav class="toolbar" aria-label="Verktyg">
+    <div class="group">
+      <label>Rader <input id="rows" type="number" min="3" max="25" value="9"></label>
+      <label>Kolumner <input id="cols" type="number" min="3" max="25" value="9"></label>
+      <button id="btn-new" title="Skapa ett nytt tomt rutnät">Nytt rutnät</button>
+    </div>
+    <div class="group">
+      <button id="btn-draw" class="toggle" aria-pressed="false" title="Klicka i rutnätet för att växla svarta rutor (kortkommando: punkt)">■ Rita svarta</button>
+      <label class="check"><input id="symmetry" type="checkbox" checked> Symmetri</label>
+    </div>
+    <div class="group">
+      <button id="btn-fill" class="primary" title="Fyll alla tomma rutor med ord ur ordlistan">Fyll automatiskt</button>
+      <button id="btn-clear-auto" title="Ta bort bokstäver som fyllmotorn satt in">Töm autofyllt</button>
+      <button id="btn-clear-all" title="Ta bort alla bokstäver men behåll svarta rutor">Töm bokstäver</button>
+    </div>
+    <div class="group">
+      <button id="btn-save">Spara fil</button>
+      <label class="button" for="file-open">Öppna fil</label>
+      <input id="file-open" type="file" accept=".json,application/json" hidden>
+      <button id="btn-print">Skriv ut</button>
+    </div>
+  </nav>
+
+  <main class="layout">
+    <section class="board-wrap">
+      <div id="board" class="board" tabindex="0" aria-label="Korsordsrutnät"></div>
+      <p class="hint">Skriv bokstäver direkt. <kbd>Mellanslag</kbd> byter riktning, <kbd>.</kbd> växlar svart ruta, <kbd>Tab</kbd> går till nästa ord, piltangenter flyttar.</p>
+    </section>
+
+    <aside class="side">
+      <section class="panel" id="slot-panel">
+        <h2 id="slot-title">Välj en ruta</h2>
+        <div class="slot-meta" id="slot-meta"></div>
+        <ul class="suggestions" id="suggestions"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Ledtrådar</h2>
+          <label class="inline">AI-nivå
+            <select id="difficulty">
+              <option value="latt">Lätt</option>
+              <option value="medel" selected>Medel</option>
+              <option value="svar">Svår</option>
+            </select>
+          </label>
+        </div>
+        <div class="clue-cols">
+          <div><h3>Vågrätt</h3><ol class="clues" id="clues-across"></ol></div>
+          <div><h3>Lodrätt</h3><ol class="clues" id="clues-down"></ol></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Utskriftsvy, fylls av app.js -->
+  <section id="print" class="print-only" aria-hidden="true"></section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

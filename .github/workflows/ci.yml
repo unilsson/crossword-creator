@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -v
+      - name: Kontrollera JavaScript-syntax
+        run: node --check app/crossword/static/app.js
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bygg image
+        run: docker build -t crossword-creator:ci .
+      - name: Starta och rökprova
+        run: |
+          docker run -d --name korsord -p 8000:8000 -e AUTO_FETCH_SALDO=0 crossword-creator:ci
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8000/api/status && break
+            sleep 1
+          done
+          curl -fsS "http://localhost:8000/api/words?pattern=K%3FTT" | grep -q KATT
+          curl -fsS http://localhost:8000/ | grep -q Korsordsmakaren
+      - name: Loggar vid fel
+        if: failure()
+        run: docker logs korsord

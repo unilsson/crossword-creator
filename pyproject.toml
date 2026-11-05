@@ -1,0 +1,9 @@
+[project]
+name = "crossword-creator"
+version = "0.1.0"
+description = "Korsordsmakare med svensk ordlista och AI-hjälp"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["app"]
+testpaths = ["tests"]
