@@ -527,23 +527,34 @@ $("file-open").onchange = async (e) => {
 function buildPrint() {
   computeSlots();
   const esc = (s) => s.replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
-  let html = `<h1 class="print-title">${esc($("title").value)}</h1><table class="print-grid">`;
+  let html = `<h1 class="print-title">${esc($("title").value)}</h1>`;
+
+  // Rutnätet ritas som SVG: fyllda ytor i SVG skrivs alltid ut, till skillnad
+  // från CSS-bakgrunder som webbläsare hoppar över om inte "skriv ut bakgrunder" är på.
+  const U = 10; // en ruta = 10 enheter
+  const cellMm = Math.min(13, 174 / S.cols, 150 / S.rows);
+  const w = S.cols * U, h = S.rows * U;
+  let svg = `<svg class="print-grid" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 ${w + 1} ${h + 1}" ` +
+    `style="width:${(S.cols * cellMm).toFixed(1)}mm;height:${(S.rows * cellMm).toFixed(1)}mm">`;
   for (let r = 0; r < S.rows; r++) {
-    html += "<tr>";
     for (let c = 0; c < S.cols; c++) {
       const x = cell(r, c);
+      svg += `<rect x="${c * U}" y="${r * U}" width="${U}" height="${U}" fill="${x.b ? "#000" : "#fff"}" stroke="#000" stroke-width="0.35"/>`;
       const n = numbers.get(idx(r, c));
-      html += x.b ? `<td class="block"></td>` : `<td>${n ? `<span class="num">${n}</span>` : ""}</td>`;
+      if (n && !x.b) svg += `<text x="${c * U + 0.7}" y="${r * U + 2.9}" font-size="2.7" font-family="Helvetica, Arial, sans-serif">${n}</text>`;
     }
-    html += "</tr>";
   }
-  html += `</table><div class="print-clues">`;
+  svg += `<rect x="0" y="0" width="${w}" height="${h}" fill="none" stroke="#000" stroke-width="1"/></svg>`;
+  html += svg;
+
+  html += `<div class="print-clues">`;
   for (const [dir, label] of [[ACROSS, "Vågrätt"], [DOWN, "Lodrätt"]]) {
-    html += `<h3>${label}</h3><ol>`;
+    html += `<section><h3>${label}</h3><ol>`;
     for (const s of slots.filter((x) => x.dir === dir)) {
-      html += `<li><b>${s.num}</b> ${esc(S.clues[s.key] || "…")} (${s.cells.length})</li>`;
+      const clue = S.clues[s.key] ? esc(S.clues[s.key]) : `<span class="missing">…</span>`;
+      html += `<li><b>${s.num}</b><span>${clue} (${s.cells.length})</span></li>`;
     }
-    html += `</ol>`;
+    html += `</ol></section>`;
   }
   html += `</div>`;
   if (/saldo|words\.tsv/i.test(wordlistSource)) html += `<p class="print-credit">Ordlista: SALDO, Språkbanken Text (CC BY 4.0)</p>`;

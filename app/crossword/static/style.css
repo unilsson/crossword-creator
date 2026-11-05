@@ -182,22 +182,26 @@ select { border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; ba
 /* ---------- utskrift ---------- */
 .print-only { display: none; }
 @media print {
-  @page { margin: 14mm; }
-  body { background: #fff; }
+  /* Marginal 0 tar bort webbläsarens sidhuvud/sidfot (titel, URL, datum).
+     Marginalen läggs i stället som utfyllnad runt innehållet. */
+  @page { size: A4; margin: 0; }
+  html, body { background: #fff !important; margin: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .topbar, .toolbar, .layout, .toast { display: none !important; }
-  .print-only { display: block; }
-  .print-title { font: 600 22pt var(--serif); margin: 0 0 8mm; }
-  .print-grid { border-collapse: collapse; margin-bottom: 8mm; }
-  .print-grid td {
-    width: 9mm; height: 9mm; border: .3mm solid #000; position: relative;
-    vertical-align: middle; text-align: center; font: 600 13pt var(--sans);
+  .print-only { display: block; padding: 16mm 18mm 14mm; color: #000; }
+  .print-title { font: 600 22pt/1.15 var(--serif); margin: 0 0 7mm; }
+  .print-grid { display: block; margin: 0 auto 9mm; }
+  .print-clues {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 10mm;
+    font: 10.5pt/1.35 var(--serif);
   }
-  .print-grid td.block { background: #000; }
-  .print-grid .num { position: absolute; top: .4mm; left: .7mm; font: 6pt var(--sans); }
-  .print-clues { columns: 2; column-gap: 10mm; font: 10.5pt/1.35 var(--serif); }
-  .print-clues h3 { font: 700 11pt var(--sans); margin: 0 0 2mm; break-after: avoid; }
-  .print-clues ol { list-style: none; padding: 0; margin: 0 0 5mm; }
-  .print-clues li { break-inside: avoid; margin-bottom: 1mm; }
-  .print-clues b { display: inline-block; min-width: 7mm; }
-  .print-credit { font: 8pt var(--sans); color: #555; margin-top: 6mm; }
+  .print-clues h3 {
+    font: 700 10pt var(--sans); text-transform: uppercase; letter-spacing: .08em;
+    margin: 0 0 2.5mm; padding-bottom: 1mm; border-bottom: .3mm solid #000;
+  }
+  .print-clues ol { list-style: none; padding: 0; margin: 0; }
+  .print-clues li { display: grid; grid-template-columns: 8mm 1fr; break-inside: avoid; margin-bottom: 1.2mm; }
+  .print-clues b { font-family: var(--sans); font-size: 9.5pt; }
+  .print-clues .missing { color: #999; }
+  .print-credit { font: 7.5pt var(--sans); color: #555; margin: 8mm 0 0; }
 }
