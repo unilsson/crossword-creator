@@ -20,7 +20,7 @@ cp .env.example .env        # valfritt, för AI-inställningar
 docker compose up -d --build
 ```
 
-Öppna sedan **http://localhost:8000**.
+Öppna sedan **http://localhost:8083**.
 
 Första gången laddar containern ner ordlistan SALDO (ca 70 MB) och bygger ett
 ordindex. Det tar någon minut. Under tiden används en liten inbyggd exempellista,

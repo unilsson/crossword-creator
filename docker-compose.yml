@@ -5,7 +5,7 @@ services:
     container_name: crossword-creator
     restart: unless-stopped
     ports:
-      - "${PORT:-8000}:8000"
+      - "${PORT:-8083}:8000"
     environment:
       # Hämta och bygg SALDO automatiskt första gången (ca 70 MB nedladdning).
       AUTO_FETCH_SALDO: "${AUTO_FETCH_SALDO:-1}"
