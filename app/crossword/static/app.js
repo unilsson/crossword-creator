@@ -26,7 +26,7 @@ function newPuzzle(rows, cols) {
     rows, cols,
     cells: Array.from({ length: rows * cols }, () => ({ b: false, ch: "", auto: false })),
     clues: {},
-    symmetry: true,
+    symmetry: false,
   };
 }
 
@@ -473,7 +473,6 @@ function serialize() {
     title: $("title").value,
     rows: S.rows,
     cols: S.cols,
-    symmetry: $("symmetry").checked,
     grid: gridForApi(),
     auto: S.cells.map((x) => (x.auto ? 1 : 0)),
     entries: slots.map((s) => ({
@@ -501,7 +500,6 @@ function load(data) {
   $("title").value = S.title;
   $("rows").value = rows;
   $("cols").value = cols;
-  $("symmetry").checked = data.symmetry !== false;
   cur = { r: 0, c: 0, dir: ACROSS };
   lastSlotSignature = "";
   render();
